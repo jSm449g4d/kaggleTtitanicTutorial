@@ -16,9 +16,12 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(os.path.dirname(os.path.join("./", __file__)))
 
 def outlierDf(df):
-    #q_low = df.quantile(0.05)
-    #q_hi  = df.quantile(0.95)
-    #df.median()
+    for i in range(len(df.columns)):
+        col = df.iloc[:,i]
+        outlier_min = np.mean(col) - np.std(col) * 2
+        outlier_max = np.mean(col) + np.std(col) * 2
+        col[col < outlier_min] = outlier_min
+        col[col > outlier_max] = outlier_max
     tDfn=(df-df.min())/(df.max()-df.min())
     return tDfn
 
