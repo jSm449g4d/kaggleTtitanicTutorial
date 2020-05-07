@@ -5,12 +5,10 @@ import pandas as pd
 import os
 import sys
 
-from sklearn.model_selection import KFold,cross_validate
+from sklearn.model_selection import cross_validate
 from sklearn import svm
 
 import optuna
-
-
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(os.path.dirname(os.path.join("./", __file__)))
@@ -52,6 +50,7 @@ print(study.best_trial)
 
 clf = svm.SVC(C=study.best_params["C"], gamma=study.best_params["gamma"],verbose=True)
 clf.fit(trainX,trainY)
-testDf["Survived"]=clf.predict(testX)
-testDf[["PassengerId","Survived"]].to_csv("./submission.csv",index=False)
 
+submissionDf=pd.read_csv("gender_submission.csv")
+submissionDf["Survived"]=clf.predict(testX)
+submissionDf[["PassengerId","Survived"]].to_csv("./submission.csv",index=False)
