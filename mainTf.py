@@ -27,16 +27,18 @@ def normDf(df,_min=0,_max=1.0):
     return df
     
 
-trainDf=pd.read_csv("train.csv")[["Pclass","Age","Sex","Fare","Embarked","Survived"]].dropna()
+trainDf=pd.read_csv("train.csv")
 trainDf["Age"]=normDf(trainDf["Age"],_min=10,_max=80)
 trainDf["Fare"]=normDf(trainDf["Fare"],_min=0,_max=500)
+trainDf["SibSp"]=normDf(trainDf["SibSp"],_min=0,_max=5)
 
 testDf=pd.read_csv("test.csv")
 testDf["Age"]=normDf(testDf["Age"],_min=10,_max=80)
 testDf["Fare"]=normDf(testDf["Fare"],_min=0,_max=500)
+trainDf["SibSp"]=normDf(trainDf["SibSp"],_min=0,_max=5)
 
 trainX=trainDf[["Pclass","Age","Sex","Fare","Embarked"]]
-trainX=pd.get_dummies(trainX)
+trainX=pd.get_dummies(trainX.fillna(trainX.median()))
 trainY=trainDf["Survived"]
 del trainDf
 
@@ -46,14 +48,16 @@ del testDf
 
 def GEN(input_shape):
     mod=mod_inp = Input(shape=input_shape)
-    mod=Dense(32,activation="relu")(mod)
-    mod=Dropout(0.1)(mod)
     mod=Dense(64,activation="relu")(mod)
-    mod=Dropout(0.1)(mod)
+    mod=Dropout(0.25)(mod)
     mod=Dense(64,activation="relu")(mod)
-    mod=Dropout(0.1)(mod)
-    mod=Dense(32,activation="relu")(mod)
-    mod=Dropout(0.1)(mod)
+    mod=Dropout(0.25)(mod)
+    mod=Dense(64,activation="relu")(mod)
+    mod=Dropout(0.25)(mod)
+    mod=Dense(64,activation="relu")(mod)
+    mod=Dropout(0.25)(mod)
+    mod=Dense(64,activation="relu")(mod)
+    mod=Dropout(0.25)(mod)
     mod=Dense(1,activation="sigmoid")(mod)
     return keras.models.Model(inputs=mod_inp, outputs=mod)
 
@@ -62,7 +66,7 @@ model.compile(optimizer='adam',
                 loss=keras.losses.binary_crossentropy)
 model.summary()
     
-model.fit(trainX,trainY,epochs=100)
+model.fit(trainX,trainY,epochs=300)
 model.save('myModel.h5')
 
 
